@@ -1,0 +1,71 @@
+{% extends "layout.html" %}
+
+{% block title %}Methodology — Conflict Cost Tracker{% endblock %}
+
+{% block main %}
+
+<div class="about-masthead">
+    <div class="about-masthead-inner">
+        <h1 class="about-title">Methodology</h1>
+        <div class="masthead-rule" style="margin: 1rem auto;"></div>
+        <p class="about-sub">How we calculate the cost of war — and why it's harder than it sounds.</p>
+    </div>
+</div>
+
+<div class="about-body">
+
+    <div class="about-block">
+        <h2>What this site does</h2>
+        <p>Conflict Cost Tracker aggregates publicly available cost estimates from international institutions, think tanks, and investigative journalism to produce a running estimate of the financial cost of active armed conflicts. The live counter is updated in real time using estimated daily cost rates.</p>
+    </div>
+
+    <div class="about-block">
+        <h2>How the counters work</h2>
+        <p>Each conflict has a <strong>baseline total cost</strong> figure sourced from the most recent available estimate, and a <strong>daily cost rate</strong> derived from multiple sources. The counter adds the per-second equivalent of the daily rate on top of the baseline in real time.</p>
+        <p>This is an approximation — the true cost fluctuates daily and is impossible to measure precisely. The counter is designed to convey magnitude and pace, not precision.</p>
+    </div>
+
+    <div class="about-block">
+        <h2>What "cost" includes</h2>
+        <ul>
+            <li>Military expenditure — weapons, personnel, logistics, fuel</li>
+            <li>Foreign military aid — equipment and funds from third countries</li>
+            <li>Economic damage — GDP losses, destroyed infrastructure, disrupted trade</li>
+            <li>Humanitarian aid — food, shelter, medical care for displaced populations</li>
+            <li>Reconstruction costs — estimated future cost of rebuilding</li>
+        </ul>
+        <p>Indirect costs such as long-term disability, mental health burden, and environmental damage are not included — meaning real costs are almost certainly higher.</p>
+    </div>
+
+    <div class="about-block">
+        <h2>Primary sources</h2>
+        <ul>
+            <li><a href="https://www.ifw-kiel.de/topics/war-against-ukraine/ukraine-support-tracker/" target="_blank">Kiel Institute — Ukraine Support Tracker ↗</a></li>
+            <li><a href="https://www.unocha.org" target="_blank">UN Office for the Coordination of Humanitarian Affairs ↗</a></li>
+            <li><a href="https://www.worldbank.org" target="_blank">World Bank — Damage and Needs Assessments ↗</a></li>
+            <li><a href="https://www.imf.org" target="_blank">International Monetary Fund ↗</a></li>
+            <li><a href="https://acleddata.com" target="_blank">Armed Conflict Location & Event Data Project ↗</a></li>
+            <li><a href="https://www.cbo.gov" target="_blank">Congressional Budget Office ↗</a></li>
+            <li>Reuters, Associated Press, and Financial Times investigative reports</li>
+        </ul>
+    </div>
+
+    <div class="about-block">
+        <h2>Disclaimers</h2>
+        <ul>
+            <li>All figures are estimates. Exact costs of active conflicts cannot be verified.</li>
+            <li>This site is politically neutral. It presents data, not opinions.</li>
+            <li>Casualty figures reflect confirmed reports. Actual figures are likely higher.</li>
+            <li>Data is updated periodically — the live counter does not reflect breaking news.</li>
+        </ul>
+    </div>
+
+    <div class="about-block">
+        <h2>Built with</h2>
+        <p>Python &middot; Flask &middot; Chart.js &middot; Bootstrap &middot; HTML &amp; CSS</p>
+        <p>Created as a CS50x Final Project.</p>
+    </div>
+
+</div>
+
+{% endblock %}

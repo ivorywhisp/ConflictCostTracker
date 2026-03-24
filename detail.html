@@ -1,0 +1,150 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ c.name }} — Conflict Cost Tracker{% endblock %}
+
+{% block main %}
+
+<div class="detail-masthead">
+    <div class="detail-masthead-inner">
+        <a href="/" class="back-link">← All Conflicts</a>
+        <div class="detail-flags">{{ c.flag_a }} {{ c.flag_b }}</div>
+        <p class="detail-tag">Active Conflict</p>
+        <h1 class="detail-title">{{ c.name }}</h1>
+        <p class="detail-started">Started {{ c.started }} &mdash; Day {{ c.days }}</p>
+        <div class="detail-rule"></div>
+        <p class="detail-desc">{{ c.description }}</p>
+    </div>
+</div>
+
+<div class="detail-counter-band">
+    <div class="detail-counter-band-inner">
+        <p class="detail-counter-label">Estimated total cost since {{ c.started }}</p>
+        <div class="detail-counter-main"
+             data-total="{{ c.current_total | int }}"
+             data-daily="{{ c.daily_cost_usd }}">
+            <span class="detail-counter-dollar">$</span><span class="dcval">0</span>
+        </div>
+        <p class="detail-per-day">Burning ${{ "{:,.0f}".format(c.daily_cost_usd) }} every single day</p>
+    </div>
+</div>
+
+<div class="detail-stats-row">
+    <div class="detail-stats-inner">
+        <div class="detail-stat">
+            <div class="detail-stat-value">{{ c.casualties }}</div>
+            <div class="detail-stat-label">Casualties</div>
+        </div>
+        <div class="detail-stat">
+            <div class="detail-stat-value">{{ c.displaced }}</div>
+            <div class="detail-stat-label">Displaced</div>
+        </div>
+        <div class="detail-stat">
+            <div class="detail-stat-value">{{ c.days }}</div>
+            <div class="detail-stat-label">Days</div>
+        </div>
+        <div class="detail-stat">
+            <div class="detail-stat-value">${{ "{:,.0f}".format(c.daily_cost_usd / 3600) }}</div>
+            <div class="detail-stat-label">Cost per hour</div>
+        </div>
+    </div>
+</div>
+
+<div class="detail-body">
+    <div>
+        <span class="detail-section-label">Spending breakdown</span>
+        <canvas id="breakdownChart"></canvas>
+
+        <span class="detail-section-label mt-4">Cost per taxpayer</span>
+        {% for p in c.per_taxpayer %}
+        <div class="taxpayer-row">
+            <div class="taxpayer-flag-name">{{ p.flag }} {{ p.country }}</div>
+            <div class="taxpayer-bar-wrap">
+                <div class="taxpayer-bar" data-width="{{ p.amount[1:] | replace(',','') | float / 100 }}%"></div>
+            </div>
+            <div class="taxpayer-amount">{{ p.amount }}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div>
+        <span class="detail-section-label">Key funders</span>
+        {% for f in c.top_funders %}
+        <div class="funder-row">
+            <div class="funder-flag">{{ f.flag }}</div>
+            <div class="funder-info">
+                <div class="funder-name">{{ f.country }}</div>
+                <div class="funder-type">{{ f.type }}</div>
+            </div>
+            <div class="funder-amount">{{ f.amount }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="sources-band">
+    <div class="sources-inner">
+        <span class="detail-section-label">Sources</span>
+        <ul class="sources-list">
+            {% for s in c.sources %}
+            <li><a href="{{ s.url }}" target="_blank" rel="noopener">{{ s.name }} ↗</a></li>
+            {% endfor %}
+            <li><a href="/about">Read methodology →</a></li>
+        </ul>
+    </div>
+</div>
+
+<script>
+// Counter
+const counterEl = document.querySelector('.detail-counter-main');
+let total = parseInt(counterEl.dataset.total);
+const daily = parseInt(counterEl.dataset.daily);
+const perSecond = daily / 86400;
+const valEl = counterEl.querySelector('.dcval');
+
+function fmt(n) {
+    if (n >= 1e12) return (n / 1e12).toFixed(3) + ' Trillion';
+    if (n >= 1e9)  return (n / 1e9).toFixed(3) + ' Billion';
+    if (n >= 1e6)  return (n / 1e6).toFixed(3) + ' Million';
+    return n.toLocaleString();
+}
+
+valEl.textContent = fmt(total);
+setInterval(() => { total += perSecond; valEl.textContent = fmt(total); }, 1000);
+
+// Chart
+const ctx = document.getElementById('breakdownChart').getContext('2d');
+const breakdown = {{ c.breakdown | tojson }};
+const accent = '{{ c.color }}';
+new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: breakdown.map(b => b.label),
+        datasets: [{
+            data: breakdown.map(b => b.pct),
+            backgroundColor: ['#8b3a2a','#b8922a','#6b6560','#c8bfb0','#e5dfd4'],
+            borderWidth: 0,
+        }]
+    },
+    options: {
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    color: '#6b6560',
+                    font: { family: 'DM Sans', size: 11 },
+                    padding: 14,
+                    boxWidth: 10,
+                }
+            }
+        },
+        cutout: '62%',
+    }
+});
+
+// Bars
+document.querySelectorAll('.taxpayer-bar').forEach(b => {
+    setTimeout(() => { b.style.width = b.dataset.width; }, 400);
+});
+</script>
+
+{% endblock %}

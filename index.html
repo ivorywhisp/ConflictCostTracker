@@ -1,0 +1,86 @@
+{% extends "layout.html" %}
+
+{% block title %}Conflict Cost Tracker — The Price of War{% endblock %}
+
+{% block main %}
+
+<section class="masthead">
+    <div class="masthead-inner">
+        <p class="masthead-overline">Real-Time Estimates</p>
+        <h1 class="masthead-title">The Cost of War</h1>
+        <div class="masthead-rule"></div>
+        <p class="masthead-sub">Every second, armed conflicts drain billions from economies, governments, and human lives. This tracker converts that into numbers you can feel.</p>
+    </div>
+</section>
+
+<section class="conflicts-section">
+    <div class="conflicts-header">
+        <span class="conflicts-header-label">Active Conflicts — {{ conflicts | length }} tracked</span>
+    </div>
+
+    {% for c in conflicts %}
+    <a href="/conflict/{{ c.id }}" class="conflict-row">
+        <div class="conflict-row-left">
+            <div class="conflict-meta">
+                <span class="conflict-flag">{{ c.flag_a }} {{ c.flag_b }}</span>
+                <span class="conflict-tag">Active</span>
+                <span class="conflict-day-tag">Day {{ c.days }}</span>
+            </div>
+            <h2 class="conflict-name">{{ c.name }}</h2>
+            <p class="conflict-desc">{{ c.description[:130] }}...</p>
+            <div class="conflict-footnote">
+                <span class="conflict-stat-inline"><strong>{{ c.casualties }}</strong> casualties</span>
+                <span class="conflict-stat-inline"><strong>{{ c.displaced }}</strong> displaced</span>
+                <span class="conflict-cta">Full breakdown →</span>
+            </div>
+        </div>
+        <div class="conflict-row-right">
+            <span class="counter-label">Estimated total cost</span>
+            <div class="counter-value-wrap"
+                 data-total="{{ c.current_total | int }}"
+                 data-daily="{{ c.daily_cost_usd }}">
+                $<span class="cval">0</span>
+            </div>
+            <div class="counter-daily">+${{ "{:,.0f}".format(c.daily_cost_usd) }}/day</div>
+        </div>
+    </a>
+    {% endfor %}
+</section>
+
+<section class="context-band">
+    <div class="context-band-inner">
+        <div class="context-item">
+            <div class="context-icon">💊</div>
+            <p>One day of the Ukraine war could fund the WHO's entire annual budget.</p>
+        </div>
+        <div class="context-item">
+            <div class="context-icon">🏫</div>
+            <p>The total spent on these conflicts could build two million schools in the developing world.</p>
+        </div>
+        <div class="context-item">
+            <div class="context-icon">🌍</div>
+            <p>Over 26 million people have been forcibly displaced by these three conflicts alone.</p>
+        </div>
+    </div>
+</section>
+
+<script>
+document.querySelectorAll('.counter-value-wrap').forEach(el => {
+    let total = parseInt(el.dataset.total);
+    const daily = parseInt(el.dataset.daily);
+    const perSecond = daily / 86400;
+    const valueEl = el.querySelector('.cval');
+
+    function fmt(n) {
+        if (n >= 1e12) return (n / 1e12).toFixed(2) + 'T';
+        if (n >= 1e9)  return (n / 1e9).toFixed(2) + 'B';
+        if (n >= 1e6)  return (n / 1e6).toFixed(2) + 'M';
+        return n.toLocaleString();
+    }
+
+    valueEl.textContent = fmt(total);
+    setInterval(() => { total += perSecond; valueEl.textContent = fmt(total); }, 1000);
+});
+</script>
+
+{% endblock %}
